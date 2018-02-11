@@ -9,6 +9,7 @@ $(document).ready(function () {
             data: [],
             render: function(){
                     if(Object.keys(this.data).length > 0) {
+                        console.log('mazu a znovuvytvarim _cely_ strom');
                         $('.data').html("");
                         $.each(this.data, function (index, depth) {
                             console.log(index);
