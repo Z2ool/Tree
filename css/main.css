@@ -1,0 +1,50 @@
+/**
+ * @author Petr Klezla
+ * @date 10.02.2018
+ */
+.row.border, .row.border > div{
+    outline: 1px black solid;
+}
+.fa {
+    cursor: pointer;
+    color: red;
+    width: 0;
+    overflow: hidden;
+    transition: width 500ms;
+}
+
+.node:hover .fa{
+    width: 20px;
+}
+.w-auto
+{
+    flex: 1 1 0;
+}
+
+.w-5{
+    width: 60px;
+}
+.message {
+    position: relative;
+}
+.message .help-block{
+    position: absolute;
+    bottom: -20px;
+}
+
+.flash{
+
+}
+
+.alert {
+    position: fixed;
+    margin-top: -50px;
+    width: 100%;
+    z-index: 2;
+    /*color: white;*/
+    transition: all 1s;
+}
+.alert.alert-danger,.alert.alert-success {
+    margin-top: 0px;
+    transition: all 1s;
+}

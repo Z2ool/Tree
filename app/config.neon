@@ -1,0 +1,30 @@
+
+php:
+    date.timezone: Europe/Prague
+
+parameters:
+	database:
+		driver: mysql
+		host: localhost
+		dbname: tree
+		user: root
+		password:
+
+database:
+	dsn:        "%database.driver%:host=%database.host%;dbname=%database.dbname%"
+	user:       %database.user%
+	password:   %database.password%
+	debugger:   true        # debugger bar panel
+	explain:    false        # explain queries in debugger bar
+	reflection: conventional  # or conventional or classname, default is discovered
+	autowired:  true
+application:
+	debugger: true
+	mapping:
+		*: App\Presenters\*Presenter
+
+services:
+    router: App\Router\RouterFactory::createRouter
+    - App\Model\Tree
+    - App\Form\FormFactory
+    - App\Form\CreateForm

@@ -1,0 +1,47 @@
+{*
+* @author Petr Klezla
+* @project Tree
+* @date 10.02.2018
+*}
+{block title}
+    Strom
+{/block}
+
+{block content}
+<div class="alert" role="alert">
+
+</div>
+<div class="container tree"
+     data-data="{link Tree:init}"
+     data-insert="{link Tree:insert}"
+     data-delete="{link Tree:delete}">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center">{include title|striptags}</h1>
+        </div>
+    </div>
+    <div class="row mt-4 mb-4">
+        {form form class=>'form-inline ajax'}
+            <div class="form-group mx-sm-3 mb-2 message">
+                {label parent_id class=>'sr-only'}
+                {input parent_id class=>'form-control'}
+            </div>
+            <button type="submit" class="btn btn-primary mb-2" n:name="ok">Přidat</button>
+        {/form}
+
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <p>Hlavní kořen stromu založíte prázdným ID rodiče a kliknutím na tlačítko přidat.</p>
+        </div>
+    </div>
+    <div class="row border mt-4 d-flex flex-nowrap">
+        <div class="font-weight-bold w-5 text-center">Depth</div>
+        <div class="font-weight-bold w-auto text-center">Tree Nodes</div>
+    </div>
+    <div class="data mb-4">
+        <div class="row border d-flex flex-nowrap" data-depth="0" id="0">
+            <div class="node text-center w-auto">NO DATA</div>
+        </div>
+    </div>
+</div>
