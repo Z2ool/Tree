@@ -44,4 +44,14 @@
             <div class="node text-center w-auto">NO DATA</div>
         </div>
     </div>
+    <div id="templates" style="display: none">
+        <div id="depth-indicator-template" class="row border d-flex flex-nowrap" data-depth="{notADepth}">
+            <div class="node w-5 font-weight-bold text-center">
+                {depth}
+            </div>
+        </div>
+        <div id="node-template" class="node text-center w-auto" data-parent="{parent}" data-id="{id}">
+            <span class="fa fa-minus" aria-hidden="true"></span> [P:{parent} ID: {id}] <span class="fa fa-plus" aria-hidden="true"></span>
+        </div>
+    </div>
 </div>
