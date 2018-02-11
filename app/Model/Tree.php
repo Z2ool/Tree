@@ -53,8 +53,7 @@ class Tree
         $tree = $this->get($id);
         $this->context->query('DELETE FROM tree WHERE tree.left >= ? AND tree.right <= ?',$tree->left, $tree->right);
         $r = $tree->right - $tree->left + 1;
-        $this->context->query('UPDATE tree SET tree.left = tree.left - ? WHERE tree.left > ?',$r,$tree->right);
-        $this->context->query('UPDATE tree SET tree.right = tree.right - ? WHERE tree.right > ?',$r,$tree->right);
+        $this->context->query('UPDATE tree SET tree.left = tree.left - ?, tree.right = tree.right - ? WHERE tree.left > ?',$r,$r,$tree->right);
         $this->context->commit();
     }
 
@@ -90,8 +89,7 @@ class Tree
     private function move($left)
     {
         $this->context->beginTransaction();
-        $this->getTable()->where('tree.left>=?',$left)->update(['tree.left+=' => 2]);
-        $this->getTable()->where('tree.right>=?',$left)->update(['tree.right+=' => 2]);
+        $this->getTable()->where('tree.left>=?',$left)->update(['tree.left+=' => 2, 'tree.right+=' => 2]);
         $this->context->commit();
     }
 
