@@ -7,6 +7,9 @@ $(document).ready(function () {
     $.extend({
         Tree: {
             data: [],
+            node: $('#node'),
+            depth: $('#depth'),
+            templates: $('#templates').html(),
             render: function(){
                     if(Object.keys(this.data).length > 0) {
                         $('.data').html("");
@@ -48,22 +51,50 @@ $(document).ready(function () {
                         }
                         else
                         {
-                            this.data = data;
-                            this.render();
+                            if(data.add)
+                            {
+                                var template =$("div[data-depth='"+ data.add.depth +"']");
+                                template.html("");
+                                template.append(this.depth.html(Number(data.add.depth-1)));
+                                $.each(data.add.data, function (index, data){
+                                    var nod = this.node.clone();
+                                    nod.data('parent',data.parent_id);
+                                    nod.data('id',data.id);
+                                    nod.html('[P: '+ data.parent_id +' ID: '+ data.id +']');
+                                    template.append(nod);
+                                }.bind(this));
+                            }
+                            if(data.new)
+                            {
+                                var template = $('#templates').html();
+                                template = template.replace('[%depthReal%]',data.new.depth);
+                                template = template.replace('[%depth%]',Number(data.new.depth)-1);
+                                template = template.replace('[%id%]',data.new.id);
+                                template = template.replace('[%parent%]',data.new.parent_id);
+                                template = template.replace('[%id2%]',data.new.id);
+                                template = template.replace('[%par%]',data.new.parent_id);
+                                $(".data").append(template);
+                            }
                             this.message('Do větve s ID: ' + id + " bylo přidáno dítě.");
                         }
                     }.bind(this)
                 });
             },
             delete: function(id, parent){
-
                 if(parent) {
                     $.ajax({
                         url: $('.tree').data('delete') + id + '/',
                         dataType: "json",
                         success: function (data) {
-                            this.data = data;
-                            this.render();
+                            //Remove node
+                            $.each(data.nodes, function (index, id){
+                                $("div[data-id='"+ id +"']").remove();
+                            });
+                            //Remove all row
+                            $.each(data.depth, function (index, id){
+                                $("div[data-depth='"+ id +"']").remove();
+                            });
+                            //this.render();
                             this.message('Nodes s ID: ' + id + ' bylo vymazáno.');
                         }.bind(this)
                     });
@@ -81,13 +112,12 @@ $(document).ready(function () {
             },
             nomessage: function(type){
                 $('.alert').removeClass(type);
-                //$('.alert').html("");
             }
         }
 
     });
 
-    $.Tree.init();
+    //$.Tree.init();
 
     $('.tree').on('click', '.fa-minus', function () {
         $.Tree.delete($(this).parent('div').data('id'),$(this).parent('div').data('parent'));
@@ -100,8 +130,6 @@ $(document).ready(function () {
         e.preventDefault();
         if((Number($('.ajax input').val()) > 0 && $('#' + $('.ajax input').val())) || $('.ajax input').val() == "")
         {
-        //console.log($('.ajax input').val()=="");
-            //console.log('insert');
             $.Tree.insert($('.ajax input').val());
         }
         else
