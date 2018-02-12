@@ -1,8 +1,8 @@
-Instalace aplikace 
+**Instalace aplikace**
 
 vytvořte novou databazi.
 
-v souboru app\config.neon změňte přihlášení do databáze
+v souboru **app\config.neon** změňte přihlášení do databáze
 
 
     database:
@@ -13,3 +13,6 @@ v souboru app\config.neon změňte přihlášení do databáze
         password:
 
 Stačí pak zadat adresu aplikace a tabulka se vytvoří sama. 
+
+Instalační sql data jsou v souboru
+**app\install.sql**
