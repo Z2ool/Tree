@@ -55,7 +55,10 @@ $(document).ready(function () {
                             {
                                 var template =$("div[data-depth='"+ data.add.depth +"']");
                                 template.html("");
-                                template.append(this.depth.html(Number(data.add.depth-1)));
+                                var depth = this.depth.clone();
+                                depth = depth[0].outerHTML;
+                                depth = depth.replace('[%depth%]',Number(data.add.depth)-1);
+                                template.append(depth);
                                 $.each(data.add.data, function (index, data){
                                     var nod = this.node.clone();
                                     nod = nod[0].outerHTML;
