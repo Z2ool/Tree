@@ -9,6 +9,7 @@ use Nette\Database\Context;
 use Nette\Database\Helpers;
 use Nette\Database\Table\IRow;
 use Nette\SmartObject;
+use Tracy\Debugger;
 
 class Tree
 {
@@ -51,8 +52,15 @@ class Tree
     {
         $this->context->beginTransaction();
         $tree = $this->get($id);
-        $this->context->query('DELETE FROM tree WHERE tree.left >= ? AND tree.right <= ?',$tree->left, $tree->right);
+        $this->getTable()
+            ->where('tree.left >= ?',$tree->left)
+            ->where('tree.right <= ?',$tree->right)
+            ->delete();
+        //$this->context->query('DELETE FROM tree WHERE tree.left >= ? AND tree.right <= ?',$tree->left, $tree->right);
         $r = $tree->right - $tree->left + 1;
+        //$this->getTable()
+        //    ->where('tree.left > ?',$tree->right)
+        //    ->update(['tree.left-=' => $r,'tree.right-=' => $r]);
         $this->context->query('UPDATE tree SET tree.left = tree.left - ? WHERE tree.left > ?',$r,$tree->right);
         $this->context->query('UPDATE tree SET tree.right = tree.right - ? WHERE tree.right > ?',$r,$tree->right);
         $this->context->commit();
@@ -60,6 +68,7 @@ class Tree
 
     /**
      * @param array $values
+     * @return bool|int|\Nette\Database\Table\ActiveRow
      */
     public function insert(array $values)
     {
@@ -81,7 +90,22 @@ class Tree
         $values['right'] = $right;
 
         $this->move($left);
-        $this->getTable()->insert($values);
+        return $this->getTable()->insert($values);
+    }
+
+    /**
+     * @param $depth
+     * @return int
+     */
+    public function getCountDepth($depth)
+    {
+        return $this->getTable()->where('depth', $depth)->count('*');
+    }
+
+    public function getAllByDepth($depth)
+    {
+        return $this->getTable()->select('id, parent_id, depth')
+            ->where('depth', $depth)->order('left');
     }
 
     /**
@@ -105,6 +129,35 @@ class Tree
             $data = $this->depth($data);
         return $data;
     }
+
+    /**
+     * @param $id
+     * @return array
+     */
+    public function getAllNode($id)
+    {
+        $element = $this->get($id);
+        $nodes = $this->getTable()
+            ->where('left>=?',$element->left)
+            ->where('right<=?',$element->right)
+            ->order('left');
+        $data = [];
+        foreach ($nodes as $node)
+        {
+            $data['nodes'][] = $node->id;
+            $data['depth'][] = $node->depth;
+        }
+        $data['depth'] = array_unique($data['depth']);
+        return $data;
+    }
+
+    public function isDepth(array $depth)
+    {
+        return $this->getTable()
+            ->select('depth')
+            ->where('depth', $depth)
+            ->fetchPairs('depth','depth');
+    }
     /**
      * @return $IRow
      */
@@ -124,6 +177,8 @@ class Tree
         {
             $data[$node->depth][] = [
                 'parent'=>$node->parent_id,
+                'left'=>$node->left,
+                'right'=>$node->right,
                 'id'=>$node->id
             ];
         }

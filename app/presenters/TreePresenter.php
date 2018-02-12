@@ -10,6 +10,10 @@ namespace App\Presenters;
 use App\Form\CreateForm;
 use Nette\Application\UI\Presenter;
 use App\Model;
+use Nette\Database\Table\ActiveRow;
+use Nette\Database\Table\IRow;
+use Nette\Database\Table\Selection;
+use Tracy\Debugger;
 
 class TreePresenter extends Presenter
 {
@@ -21,6 +25,8 @@ class TreePresenter extends Presenter
      * @var CreateForm
      */
     private $createForm;
+    /** @var Selection|IRow|array */
+    private $items;
 
     public function __construct(Model\Tree $treeModel,
                                 CreateForm $createForm)
@@ -48,7 +54,16 @@ class TreePresenter extends Presenter
                 $this->sendJson($tree);
             }
         });
+    }
 
+    public function actionDefault()
+    {
+        $this->items = $this->treeModel->getAll(true);
+    }
+
+    public function renderDefault()
+    {
+        $this->template->items = $this->items;
     }
 
     public function actionInit()
@@ -58,27 +73,37 @@ class TreePresenter extends Presenter
     }
     public function actionDelete($id)
     {
+        $tree = $this->treeModel->getAllNode($id);
         $this->treeModel->delete($id);
-        $tree = $this->treeModel->getAll(true);
+        $depthCurrent = $this->treeModel->isDepth($tree['depth']);
+        $tree['depth'] = array_diff($tree['depth'], $depthCurrent);
+        //Debugger::barDump($tree);
+        //$tree = $this->treeModel->getAll(true);
         $this->sendJson($tree);
     }
     public function actionInsert($id = null)
     {
         if((!$this->treeModel->isTree() && is_null($id)) || $this->treeModel->get($id))
         {
-            $this->treeModel->insert(['parent_id'=>$id]);
-            $tree = $this->treeModel->getAll(true);
-            $this->sendJson($tree);
+            $row = $this->treeModel->insert(['parent_id'=>$id]);
+            $data = [];
+            if($this->treeModel->getCountDepth($row->depth) > 1)
+            {
+                $data['add']['depth'] = $row->depth;
+                /** @var ActiveRow $item */
+                foreach ($this->treeModel->getAllByDepth($row->depth) as $item)
+                {
+                    $data['add']['data'][] = $item->toArray();
+                }
+            }
+            else
+                $data['new'] = $row->toArray();
+            //$tree = $this->treeModel->getAll(true);
+            $this->sendJson($data);
         }
         else
         {
             $this->sendJson(['error'=>"Rodičovské ID: ".$id." neexistuje."]);
         }
-    }
-
-    public function actionInstall()
-    {
-        $this->treeModel->install(__DIR__."/../install.sql");
-        $this->redirect('default');
     }
 }
