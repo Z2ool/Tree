@@ -58,9 +58,11 @@ $(document).ready(function () {
                                 template.append(this.depth.html(Number(data.add.depth-1)));
                                 $.each(data.add.data, function (index, data){
                                     var nod = this.node.clone();
-                                    nod.data('parent',data.parent_id);
-                                    nod.data('id',data.id);
-                                    nod.html('[P: '+ data.parent_id +' ID: '+ data.id +']');
+                                    nod = nod[0].outerHTML;
+                                    nod = nod.replace('[%id%]',data.id);
+                                    nod = nod.replace('[%parent%]',data.parent_id);
+                                    nod = nod.replace('[%id2%]',data.id);
+                                    nod = nod.replace('[%par%]',data.parent_id);
                                     template.append(nod);
                                 }.bind(this));
                             }
