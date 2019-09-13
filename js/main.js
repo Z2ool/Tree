@@ -13,15 +13,28 @@ $(document).ready(function () {
             render: function(){
                     if(Object.keys(this.data).length > 0) {
                         $('.data').html("");
+                        // for demo purposes only there is no need to create fallbacks for obsolete browsers w/o support of 'outerHTML'
+                        var depthTemplate = $('#depth-indicator-template').outerHTML;
+                        var nodeTemplate = $('#node-template').outerHTML;
                         $.each(this.data, function (index, depth) {
                             console.log(index);
-                            var html = '<div class="row border d-flex flex-nowrap" data-depth="' + index + '" id="' + index + '">';
-                            html += '<div class="node w-5 font-weight-bold text-center">' + (index - 1) + '</div>';
+                            var html = depthTemplate;
+                            // just a simplification for demo purposes.
+                            // All the changes needed could be also defined in data returned in response
+                            // or key => value pairs can be defined in array for update
+                            html.replace('{depth}', index-1);
+                            html.replace('{notADepth}', index);
+                            // this one could be also updated one line later altering created jQuery object property:
+                            html.replace('depth-indicator-template', index);
+                            var $depthLevel = $(html);
                             $.each(depth, function (index2, node) {
-                                html += '<div class="node text-center w-auto" data-parent="' + node.parent + '" data-id="' + node.id + '"><span class="fa fa-minus" aria-hidden="true"></span> [P:' + node.parent + ' ID:' + node.id + '] <span class="fa fa-plus" aria-hidden="true"></span> </div>';
+                                var nodeHTML = nodeTemplate;
+                                nodeHTML.replace('{parent}', node.parent);
+                                nodeHTML.replace('{id}', node.id);
+                                nodeHTML.replace('node-template', node.id);
+                                $depthLevel.append(nodeHTML);
                             });
-                            html += '</div>';
-                            $('.data').append(html);
+                            $('.data').append($depthLevel);
                         })
                     }
                 //}
